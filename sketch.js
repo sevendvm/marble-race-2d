@@ -5,20 +5,20 @@
  */
 
 let numBalls = 2;
-let spring = 0.6;
+let spring = 0.7;
 let gravity = 0.09;
-let friction = -0.0;
+let friction = 1;
 let balls = [];
 
 function setup() {
   createCanvas(720, 400);
   for (let i = 0; i < numBalls; i++) {
 
-    mass = 30//random(10, 30)
+    mass = random(10, 30)
 
     balls[i] = new Ball(
-      15+30*i,//random(width),
-      15,//random(height),
+      (mass/2+mass)*i,//random(width),
+      mass/2,//random(height),
       mass,
       mass,
       i,
@@ -27,7 +27,7 @@ function setup() {
   }
   // noStroke();
   fill(255, 204);
-  frameRate(30) 
+  // frameRate(40) 
 }
 
 function draw() {
@@ -43,12 +43,19 @@ function draw() {
     ball.collide();
     ball.move();
     ball.display();
-    
-    // strokeWeight(0)
-    // text(ball.vy, 365, 10);
-    // strokeWeight(3)
-
   });
+}
+function keyPressed() {
+  numBalls++
+  mass = 30
+  balls[numBalls-1] = new Ball(
+    (mass/2+mass),//random(width),
+    mass/2,//random(height),
+    mass,
+    mass,
+    numBalls-1,
+    balls
+  ) 
 }
 
 function calculateAngle(xCoord) {
@@ -78,35 +85,32 @@ class Ball {
     this.x = xin;
     this.y = yin;
     this.vx = 0;
-    this.accx = 0;
-    this.accy = mass * gravity
-    this.vy = 0;
+    // this.accx = 0;
+    // this.accy = mass * gravity
+    this.vy = mass * gravity;
     this.diameter = din;
     this.mass = mass;    
     this.id = idin;
     this.others = oin;
+    this.color = [random(255), random(255), random(255)]
   }
 
   collide() {
     for (let i = this.id + 1; i < numBalls; i++) {
-      // console.log(others[i]);
       let dx = this.others[i].x - this.x;
       let dy = this.others[i].y - this.y;
       let distance = sqrt(dx * dx + dy * dy);
       let minDist = this.others[i].diameter / 2 + this.diameter / 2;
-      //   console.log(distance);
-      //console.log(minDist);
-      if (distance < minDist) {
-        //console.log("2");
+       if (distance < minDist) {
         let angle = atan2(dy, dx);
         let targetX = this.x + cos(angle) * minDist;
         let targetY = this.y + sin(angle) * minDist;
-        let ax = (targetX - this.others[i].x) * spring;
-        let ay = (targetY - this.others[i].y) * spring;
-        this.vx -= ax;
-        this.vy -= ay * this.mass * gravity;
-        this.others[i].vx += ax;
-        this.others[i].vy += ay * this.others[i].mass;
+        let ax = (targetX - this.others[i].x) * spring / friction;
+        let ay = (targetY - this.others[i].y) * spring / friction;
+        this.vx -= ax / this.mass * this.others[i].mass;
+        this.vy -= ay / this.mass * this.others[i].mass * gravity;
+        this.others[i].vx += ax / this.others[i].mass * this.mass;
+        this.others[i].vy += ay / this.others[i].mass * this.mass * gravity;
       }
     }
   }
@@ -115,23 +119,23 @@ class Ball {
     //  console.log(this.vy)
 
     let angle = calculateAngle(this.x)
+    let lowerBound = calculateHeight(this.x);
     
     this.x += this.vx;
     this.y += this.vy;
           
     if (this.x + this.diameter / 2 > width) {
       this.x = width - this.diameter / 2;
-      this.vx = -this.vx
+      this.vx = -this.vx * spring * friction
     } else if (this.x - this.diameter / 2 < 0) {
       this.x = this.diameter / 2;
-      this.vx = -this.vx
+      this.vx = -this.vx * spring * friction
     }
-    let lowerBound = calculateHeight(this.x);
-    
+
     if (this.y + this.diameter / 2 >= lowerBound) {
       this.vx += this.mass * gravity * sin(angle);
       this.y = lowerBound - this.diameter / 2;
-      this.vy = -this.vy * spring * cos(angle)
+      this.vy = -this.vy * spring * cos(angle) * friction
     } else if (this.y - this.diameter / 2 < 0) {
       this.y = this.diameter / 2;
       this.vy = this.mass * gravity
@@ -141,6 +145,7 @@ class Ball {
   }
 
   display() {
+    fill(this.color)
     ellipse(this.x, this.y, this.diameter, this.diameter);
   }
 }
