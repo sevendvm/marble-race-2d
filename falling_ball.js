@@ -1,8 +1,8 @@
 
 gravity = 0.09
-spring = 0.7
-friction = 1.2
-
+spring = 0.6
+friction = 0.4
+balls = []
 
 class Ball {
     constructor(xin, yin, din, mass, idin, oin) {
@@ -11,7 +11,7 @@ class Ball {
       this.vx = 0;
       this.vy = 0;
       this.accx = 0;
-      this.accy = mass * gravity;
+      this.accy = gravity;
       this.diameter = din;
       this.mass = mass;    
       this.id = idin;
@@ -30,21 +30,24 @@ class Ball {
               
         if (this.x + this.diameter / 2 > width) {
           this.x = width - this.diameter / 2;
-          this.vx = -this.vx * sin(angle) * spring * friction
+          this.vx = -this.vx * spring * friction
+          this.accx =-this.accx
         } else if (this.x - this.diameter / 2 < 0) {
           this.x = this.diameter / 2;
           this.vx = -this.vx * spring * friction
+          this.accx =-this.accx
         } else {
           this.vx += this.accx
         }
     
         if (this.y + this.diameter / 2 >= lowerBound) {
-        //   this.vx += this.mass * gravity * sin(angle);
+          this.vx *= friction
+          this.accx = this.accx * friction
           this.y = lowerBound - this.diameter / 2;
           this.vy = -this.vy * spring * cos(angle) //* friction
         } else if (this.y - this.diameter / 2 < 0) {
           this.y = this.diameter / 2;
-          this.vy = this.mass * gravity
+          this.vy = gravity// this.mass * gravity
         } else {
         //   this.accy += this.accy + this.mass * gravity
           this.vy += this.accy
@@ -63,10 +66,10 @@ class Ball {
     
       display() {
         fill(255)
-        text('Vert acc = '+this.accy, 10, 10)
-        text('Vert vel = '+this.vy, 10, 30)
-        text('Horz acc = '+this.accx, 10, 50)
-        text('Horz vel = '+this.vx, 10, 70)
+        text('Vert acc = '+rnd(this.accy, 3), 10 + 100*this.id, 10)
+        text('Vert vel = '+rnd(this.vy, 3), 10+ 100*this.id, 30)
+        text('Horz acc = '+rnd(this.accx, 3), 10+ 100*this.id, 50)
+        text('Horz vel = '+rnd(this.vx, 3), 10+ 100*this.id, 70)
 
         fill(this.color)
         ellipse(this.x, this.y, this.diameter, this.diameter);
@@ -95,14 +98,16 @@ function setup() {
     fill(255, 204);
     // frameRate(2)
 
-    ball = new Ball(200, 0, 50, 2)
+    balls[0] = new Ball(100, 0, 20, 2, 0)
+    balls[1] = new Ball(300, 0, 50, 5, 1)
 
    }
   
 function draw() {
     background(100);
-
-    ball.move()
-    ball.display()
+    balls.forEach(ball => {
+      ball.move()
+      ball.display()
+    });
 
 }
