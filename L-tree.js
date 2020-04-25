@@ -3,35 +3,73 @@ class LSystem {
 
     constructor() {
 
+        // defaults 
+        this.strokeLength = 200;
+        this.strokeLengthMultiplier = 0.5;
 
-        //
-        // let axiom = "F"
-        // let sentence = "F"
-        // let rules = [
+        // a tree
+        // this.angle = PI / 6;
+        // this.axiom = "F"
+        // this.sentence = "F"
+        // this.rules = [
         //         {a : "F", 
         //         b: "FF+[+F-F+F]-[-F+F+F]"}
         //     ];
 
-        this.len = 200;
-        this.angle = radians(25);
-
+        
         // a fractal plant
+        // this.angle = radians(25);
+        // this.axiom = "X";
+        // this.sentence = this.axiom;
+        // this.rules = [
+        //     {
+        //         a: "X",
+        //         b: "F+[[X]-X]-F[-FX]+X"
+        //     },
+        //     {
+        //         a: "F",
+        //         b: "FF"
+        //     }
+        // ]
 
-        this.axiom = "X";
+        // dragon curve
+        // NOTE defaults "strokeLength" and its multiplier are overriden
+        // this.strokeLength = 10;
+        // this.strokeLengthMultiplier = 1;
+        // this.angle = PI/2;
+        // this.axiom = "FX";
+        // this.sentence = this.axiom;
+        // this.rules = [
+        //     {
+        //         a: "X",
+        //         b: "X+YFF+"
+        //     },
+        //     {
+        //         a: "Y",
+        //         b: "-FFX-Y"
+        //     }
+        // ]
+
+        // Koch curve
+        this.strokeLength = 5;
+        this.strokeLengthMultiplier = 1;
+        this.angle = PI / 2;
+        // being set this turns into a Serpinsky triangle
+        //this.angle = PI * 4 / 3;
+        this.axiom = "F";
         this.sentence = this.axiom;
         this.rules = [
             {
-                a: "X",
-                b: "F+[[X]-X]-F[-FX]+X"
-            },
-            {
                 a: "F",
-                b: "FF"
-            }
+                b: "F+F-F-F+F"
+            },
         ]
+
+
+
     }
     evolve() {
-        this.len *= 0.5;
+        this.strokeLength *= this.strokeLengthMultiplier;
 
         let nextSentence = "";
 
@@ -61,7 +99,7 @@ class LSystem {
     turlte() {
         background(50);
         resetMatrix();
-        translate(width / 2, height);
+        translate(width/2, height);
         stroke(255);
 
 
@@ -72,8 +110,8 @@ class LSystem {
 
             switch (element) {
                 case "F":
-                    line(0, 0, 0, -this.len);
-                    translate(0, -this.len);
+                    line(0, 0, 0, -this.strokeLength);
+                    translate(0, -this.strokeLength);
                     break;
                 case "+":
                     rotate(this.angle);
