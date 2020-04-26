@@ -1,69 +1,93 @@
 
+let firstInit = true;
+
 class LSystem {
 
-    constructor() {
+    constructor(parType) {
+
+        console.log(parType);
+
+        this.initialX = width / 2;
+        this.initialY = height;
 
         // defaults 
         this.strokeLength = 200;
         this.strokeLengthMultiplier = 0.5;
 
-        // a tree
-        // this.angle = PI / 6;
-        // this.axiom = "F"
-        // this.sentence = "F"
-        // this.rules = [
-        //         {a : "F", 
-        //         b: "FF+[+F-F+F]-[-F+F+F]"}
-        //     ];
+        switch (parType) {
+            case "fractalPlant":
+                // a fractal plant
+                this.angle = radians(25);
+                this.axiom = "X";
+                this.sentence = this.axiom;
+                this.rules = [
+                    {
+                        a: "X",
+                        b: "F+[[X]-X]-F[-FX]+X"
+                    },
+                    {
+                        a: "F",
+                        b: "FF"
+                    }
+                ];
+                break;
+            case "dragonCurve":
+                // dragon curve
+                // NOTE defaults "strokeLength" and its multiplier are overriden
+                this.initialX = width / 2;
+                this.initialY = height / 2;
+                this.strokeLength = 10;
+                this.strokeLengthMultiplier = 1;
+                this.angle = PI / 2;
+                this.axiom = "FX";
+                this.sentence = this.axiom;
+                this.rules = [
+                    {
+                        a: "X",
+                        b: "X+YFF+"
+                    },
+                    {
+                        a: "Y",
+                        b: "-FFX-Y"
+                    }
+                ]
+                break;
+            case "KochCurve":
+                // Koch curve
+                this.strokeLength = 5;
+                this.strokeLengthMultiplier = 1;
+                this.angle = PI / 2;
+                // being set this turns into a Serpinsky triangle
+                this.angle = PI * 4 / 3;
+                this.axiom = "F";
+                this.sentence = this.axiom;
+                this.rules = [
+                    {
+                        a: "F",
+                        b: "F+F-F-F+F"
+                    },
+                ]
+                break
+            default:
+                // a tree
+                // case "lindenmayer":
+                this.angle = PI / 12;
+                this.axiom = "F"
+                this.sentence = "F"
+                this.rules = [
+                    {
+                        a: "F",
+                        // b: "FF+[+F-F+F]-[-F+F+F]"}
+                        b: "FF+[-F-[-F+F]]-[-F++FFF[-F+F]]"
+                    }
+                ];
 
-        
-        // a fractal plant
-        // this.angle = radians(25);
-        // this.axiom = "X";
-        // this.sentence = this.axiom;
-        // this.rules = [
-        //     {
-        //         a: "X",
-        //         b: "F+[[X]-X]-F[-FX]+X"
-        //     },
-        //     {
-        //         a: "F",
-        //         b: "FF"
-        //     }
-        // ]
+                break;
+        }
 
-        // dragon curve
-        // NOTE defaults "strokeLength" and its multiplier are overriden
-        // this.strokeLength = 10;
-        // this.strokeLengthMultiplier = 1;
-        // this.angle = PI/2;
-        // this.axiom = "FX";
-        // this.sentence = this.axiom;
-        // this.rules = [
-        //     {
-        //         a: "X",
-        //         b: "X+YFF+"
-        //     },
-        //     {
-        //         a: "Y",
-        //         b: "-FFX-Y"
-        //     }
-        // ]
 
-        // Koch curve
-        this.strokeLength = 5;
-        this.strokeLengthMultiplier = 1;
-        this.angle = PI / 2;
-        // being set this turns into a Serpinsky triangle
-        //this.angle = PI * 4 / 3;
-        this.axiom = "F";
-        this.sentence = this.axiom;
-        this.rules = [
-            {
-                a: "F",
-                b: "F+F-F-F+F"
-            },
-        ]
+
+
 
 
 
@@ -99,7 +123,7 @@ class LSystem {
     turlte() {
         background(50);
         resetMatrix();
-        translate(width/2, height);
+        translate(this.initialX, this.initialY);
         stroke(255);
 
 
@@ -142,15 +166,31 @@ function onButtonPress() {
     lSystem.turlte();
 }
 
-function setup() {
+let btnEvolve = null;
 
-    lSystem = new LSystem();
 
+function setup(par) {
+    console.log(par)
+    lSystem = new LSystem(par);
+    
     createCanvas(800, 800);
-    let btnEvolve = createButton("evolve");
-    btnEvolve.mousePressed(onButtonPress);
+
+    if (firstInit) {
+        let btnEvolve = createButton("evolve");
+        btnEvolve.mousePressed(onButtonPress);
+
+        selAngle = createSelect();
+        selAngle.option('120');
+        selAngle.option('90');
+        selAngle.option('45');
+        selAngle.option('25');
+        selAngle.changed(setup);
+
+        firstInit = false;
+    }
+    
+    
 
     lSystem.turlte();
 
 }
-

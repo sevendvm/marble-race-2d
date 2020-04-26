@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="./lib/p5.js"></script>
     <script src="./lib/p5.dom.min.js"></script>
-    <script src="./lib/p5.sound.min.js"></script>
+    <!-- <script src="./lib/p5.sound.min.js"></script> -->
     <link rel="stylesheet" type="text/css" href="./lib/style.css">
     <title>The L-System tree</title>
    
 </head>
 <body>
     <script src="L-tree.js" ></script> 
+        Select type: <select name="OP" onchange="setup(value)">
+        <option value="none" selected>---select---</option>
+        <option value="lindenmayer">Lindenmayer's Algae</option>
+        <option value="fractalPlant">Fractal plant</option>
+        <option value="dragonCurve">Dragon curve</option>
+        <option value="KochCurve">Koch curve (Serpinsky triangle)</option>
+    </select>
 </body>
 </html> 
