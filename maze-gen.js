@@ -1,4 +1,4 @@
-const scl = 20;
+const scl = 10;
 
 let maze;
 
@@ -145,8 +145,6 @@ function setup() {
 }
 
 function draw() {
-    
-    
  
     let neighbors = maze.getNeighbors(current);
 
