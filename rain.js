@@ -4,16 +4,59 @@ const X_AXIS = 1,
       Y_AXIS = 2;
 
 
-const RAIN_SPEED = 20;
-const RAIN_DENSITY = 500;
-const WIND = 0;
+let RAIN_SPEED = 20;
+let RAIN_DENSITY = 500;
+let WIND = 0;
 
+var speedAdjuster, densityAdjuster, windAdjuster;
 
 function setup() {
+  
   createCanvas(1600, 800);
+
+  // let div = createDiv('Elevation:');
+  // sliderY = createSlider(-100, 200, 0);
+  // sliderY.parent(div);
+  speedAdjuster = createSlider(10, 30);
+  speedAdjuster.input(() => {
+    RAIN_SPEED = speedAdjuster.value();
+    console.log(RAIN_SPEED);
+  });
+  
+  densityAdjuster = createSlider(10, 800, 500, 10);
+  densityAdjuster.input(() => {
+    RAIN_DENSITY = densityAdjuster.value();
+
+    if (RAIN_DENSITY >= s.length){
+      for (i = 0; i < RAIN_DENSITY - s.length; i++){
+        let ray = {x: random(-width, width),
+                   y: random(-500, 0), 
+                   z: random(0, 20), 
+                   angle: WIND, 
+                   vspeed: 0,
+                  }
+        ray.vspeed = map(ray.z, 0, 20, RAIN_SPEED, 4);
+        s.push(ray);
+      }      
+    } else {
+      for (k = 0; k < s.length - RAIN_DENSITY; k++){
+        s.pop();
+      }
+    }
+  });
+
+  windAdjuster = createSlider(-6, 6, 0, 0.1);
+  windAdjuster.input(() => WIND = windAdjuster.value());
+  
+  // let a = createButton('label', undefined);
   
   for (i = 0; i < RAIN_DENSITY; i++){
-    let ray = {x: random(-width, width), y: random(-500, 0), z: random(0, 20), angle: WIND, vspeed: 0}
+    let ray = {x: random(-width, width),
+               y: random(-500, 0), 
+               z: random(0, 20), 
+               angle: WIND, 
+               vspeed: 0,
+              }
     ray.vspeed = map(ray.z, 0, 20, RAIN_SPEED, 4);
     s.push(ray);
   }
@@ -59,7 +102,7 @@ function setGradient(x, y, w, h, c1, c2, axis) {
 }
 
 function draw() { 
-  // background(50, 80, 140, 30);
+  background(50, 80, 140, 30);
   // const SKY_COLOR = color(50, 80, 140, 30);
   // const BLACK = color (10, 10, 50);
   // setGradient(0, height - 80, width, height, BLACK, SKY_COLOR, Y_AXIS);
@@ -74,13 +117,17 @@ function draw() {
     stroke(200, 200 - map(ray.z, 0, 20, 0, 200));
     // ellipse(ray.x, ray.y, map(ray.z, 0, 10, 5, 2), 8);
     
-    xOffset = map(noise(noiseOffset), 0, 1, -2, 2);
+    xOffset = map(noise(noiseOffset), 0, 1, -1, 1);
+    zModifier = map(ray.z, 0, 20, 1, 1.5);
     
-    line(ray.x, ray.y, ray.x + ray.angle + xOffset, ray.y + ray.vspeed);
+    line(ray.x, ray.y, ray.x + (WIND + xOffset)*zModifier, ray.y + ray.vspeed);
     ray.y += ray.vspeed;
-    ray.x += ray.angle+xOffset;
+    ray.x += (WIND + xOffset)*zModifier;
     if (ray.y > height){
       ray.y = random(-250, 0);
+      ray.z = random(0, 20);
+      ray.vspeed = map(ray.z, 0, 20, RAIN_SPEED, 4);
+      // ray.angle = WIND;
     }
 
     if (ray.x < -200 || ray.x > width+200) {
